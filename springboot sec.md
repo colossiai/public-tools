@@ -1,3 +1,9 @@
+* application.properties
+
+```
+login.users={"goofy":"hello", "snow-white":"7dwarf", "batman":"knight"}
+```
+
 ```java
 package io.cruiser.config;
 
