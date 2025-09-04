@@ -64,6 +64,20 @@ Run it:
 python main.py
 ```
 
+
+### ✅ Install packages from requirements.txt with uv
+
+```bash
+uv pip install -r requirements.txt
+```
+
+* example to restore project and install packages
+```bash
+uv venv .venv
+source .venv/bin/activate
+uv pip install -r requirements.txt
+```
+
 ---
 
 Let me know if you want to use `pyproject.toml` or `uv pip install --upgrade` workflows instead.
