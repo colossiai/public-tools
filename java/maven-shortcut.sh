@@ -47,3 +47,21 @@ create_jmh_project() {
 
     echo "Maven JMH project created with groupId: $group_id and artifactId: $artifact_id"
 }
+
+mvn_exec() {
+    if [ $# -eq 0 ]; then
+        echo "Error: Main class must be provided as an argument" >&2
+        echo "Usage: mvn_exec <main-class>" >&2
+        return 1
+    fi
+
+    local mainClass="$1"
+    local mvnCmd=$(command -v mvnd || command -v mvn)
+
+    if [ -z "$mvnCmd" ]; then
+        echo "Error: Neither 'mvnd' nor 'mvn' found in PATH" >&2
+        return 1
+    fi
+
+    "$mvnCmd" exec:java -Dexec.mainClass="$mainClass"
+}
