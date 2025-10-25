@@ -125,13 +125,31 @@ Based on the output you posted:
 
 # Gradle run mainClass
 
+## We can't run mainClass from jar since sometimes it require dependencies
+
+```bash
+java -cp aeron-core/build/libs/aeron-core.jar com.aeroncookbook.aeron.rpc.server.Server
+
+Error: Unable to initialize main class com.aeroncookbook.aeron.rpc.server.Server
+Caused by: java.lang.NoClassDefFoundError: org/agrona/concurrent/Agent
+
+```
+
+## We need to define mainClass in sub-module's build.gradle.kts: `aeron-core/build.gradle.kts`
+
 ```kts
+
+
+plugins {
+    application
+}
+
 application {
     mainClass.set(project.findProperty("mainClass")?.toString() ?: "com.example.DefaultMain")
 }
 ```
 
-* then run sub-module `aeron-core`
+## then run sub-module `aeron-core`
 
 ```bash
 ./gradlew :aeron-core:build
@@ -147,8 +165,22 @@ application {
 application {
     /*
     Fix UnsafeApi err:
-    Exception in thread "main" java.lang.IllegalAccessError: class org.agrona.UnsafeApi (in unnamed module @0x5ce81285) cannot access class jdk.internal.misc.Unsafe (in module java.base) because module java.base does not export jdk.internal.misc to unnamed module 
+
+    ./gradlew :aeron-core:run -PmainClass=com.aeroncookbook.aeron.rpc.server.Server
+
+    > Task :aeron-core:run
+    Exception in thread "main" java.lang.IllegalAccessError: class org.agrona.UnsafeApi (in unnamed module @0x21213b92) cannot access class jdk.internal.misc.Unsafe (in module java.base) because module java.base does not export jdk.internal.misc to unnamed module @0x21213b92
+            at org.agrona.UnsafeApi.getUnsafe(UnsafeApi.java)
+            at org.agrona.UnsafeApi.<clinit>(UnsafeApi.java)
+            at org.agrona.BufferUtil.<clinit>(BufferUtil.java:43)
+            at org.agrona.concurrent.UnsafeBuffer.wrap(UnsafeBuffer.java:176)
+            at org.agrona.concurrent.UnsafeBuffer.<init>(UnsafeBuffer.java:91)
+            at io.aeron.driver.Configuration.flowControlGroupTag(Configuration.java:1501)
+            at io.aeron.driver.MediaDriver$Context.<init>(MediaDriver.java:511)
+            at com.aeroncookbook.aeron.rpc.server.Server.main(Server.java:41)
+
      */    
+     
     applicationDefaultJvmArgs = listOf(
         "--add-opens", "java.base/jdk.internal.misc=ALL-UNNAMED",
         "--add-opens", "java.base/sun.nio.ch=ALL-UNNAMED",
