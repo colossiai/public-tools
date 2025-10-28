@@ -1,6 +1,6 @@
 #! /bin/bash
 
-uv_init() {
+uv_setup() {
     echo "Create and activate venv in ${PWD}"
     uv venv .venv
     source .venv/bin/activate
