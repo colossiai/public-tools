@@ -285,6 +285,16 @@ Tips:
   - jcmd <pid> JFR.start name=cpu settings=profile duration=60s filename=/tmp/cpu.jfr
 - Analyze and act on the top hot methods.
 
+
+```bash
+#another example
+jps -l # lookup process id, assume 437246
+top -Hp 437246 # lookup high loading thread-id, assume 832643
+printf "0x%x\n" 832643 # convert thread-id to hex, output 0xcb483
+jstack 437246 | grep 0xcb483 -A 5 # search thread stack and print following 5 rows
+
+```
+
 Notes
 - Always capture evidence while the CPU is high; after the fact, stacks may look normal.
 - On containers/Kubernetes, run these commands inside the container. Use jcmd <pid> inside the pod; ensure tools are present.
