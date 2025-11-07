@@ -1,6 +1,6 @@
 # C++ demo program with high CPU spin
 
-here are **two minimal C++ demo programs** you can compile and run to **practice diagnosing CPU spin** problem using Linux tools like `top`, `gdb`, `perf`
+here are **minimal C++ demo programs** you can compile and run to **practice diagnosing CPU spin** problem using Linux tools like `top`, `gdb`, `perf`
 
 ---
 
