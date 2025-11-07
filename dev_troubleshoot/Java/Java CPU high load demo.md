@@ -187,13 +187,15 @@ Find the Java process:
 ps -eo pid,ppid,cmd,%mem,%cpu --sort=-%cpu | head
 ```
 
+or use `top`
+
 You’ll see something like:
 
 ```
-12345  1 java HighCpuExample  2.5 200.0
+1719  1 java HighCpuExample  2.5 200.0
 ```
 
-The PID (here `12345`) is the process consuming high CPU.
+The PID (here `1719`) is the process consuming high CPU.
 
 ---
 
@@ -202,26 +204,30 @@ The PID (here `12345`) is the process consuming high CPU.
 List threads and their CPU usage:
 
 ```bash
-top -H -p 12345
+top -H -p 1719
 ```
 
 Sample output:
 
 ```
 PID   USER   PR  NI  VIRT  RES  SHR S %CPU %MEM  TIME+   COMMAND
-12345 eric   20   0  300m  60m  15m R 100.0 2.5  0:30.01 java
-12346 eric   20   0  300m  60m  15m R 100.0 2.5  0:30.02 java
+1755 adm   20   0  300m  60m  15m R 100.0 2.5  0:30.01 java
+1756 adm   20   0  300m  60m  15m R 100.0 2.5  0:30.02 java
 ```
 
-Here `12346` is a Java thread ID in the OS (aka **native thread ID**).
+Here `1755` is a Java thread ID in the OS (aka **native thread ID**).
+
+
+![alt text](cpu1.png)
+
 
 Convert it to **hexadecimal**, since Java thread dumps use hex thread IDs:
 
 ```bash
-printf "%x\n" 12346
+printf "%x\n" 1755
 ```
 
-→ e.g. `303a`
+→ e.g. `6db`
 
 ---
 
@@ -230,13 +236,13 @@ printf "%x\n" 12346
 Use `jstack` to dump the stack of the Java process:
 
 ```bash
-jstack 12345 > thread_dump.txt
+jstack 1719 > thread_dump.txt
 ```
 
 Then search for your thread ID in hex:
 
 ```bash
-grep -A30 "nid=0x303a" thread_dump.txt
+grep -A30 "nid=0x6db" thread_dump.txt
 ```
 
 You might see something like:
@@ -248,6 +254,8 @@ You might see something like:
         at HighCpuExample$BusyWorker.run(HighCpuExample.java:23)
         at java.lang.Thread.run(Thread.java:748)
 ```
+
+![alt text](cpu2.png)
 
 ✅ You’ve found the **exact function causing high CPU** (`Math.random()` in an infinite loop).
 
