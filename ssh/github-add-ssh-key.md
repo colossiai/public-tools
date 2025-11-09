@@ -1,7 +1,7 @@
 ## 1. Generate keys
 
 ```bash
-ssh-keygen -t ed25519 -C "your_email@example.com"
+ssh-keygen -t ed25519 -C "your_email@example.com" -f ~/.ssh/mykey
 ```
 
 ## 2. Copy key to  GitHub Account `Settings → SSH and GPG keys`
