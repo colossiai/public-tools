@@ -1,0 +1,8 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'java-demo'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['10.255.255.254:8080']  # host addr returned by "ip a", also wget -O- http://10.255.255.254:8080/actuator/prometheus returns correct metrics
