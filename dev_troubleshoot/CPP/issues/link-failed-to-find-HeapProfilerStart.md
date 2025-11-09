@@ -2,7 +2,7 @@
 # undefined reference to `HeapProfilerStart'
 
 ```
-g++ leak_live.cpp -o leak_live -pthread -lprofiler         1 ✘  22:32:30 
+g++ leak_live.cpp -o leak_live -pthread -lprofiler       
 /usr/bin/ld: /tmp/ccFTwglJ.o: in function `main':
 leak_live.cpp:(.text+0xcf): undefined reference to `HeapProfilerStart'
 collect2: error: ld returned 1 exit status
@@ -89,3 +89,5 @@ g++ leak_live.cpp -pthread -o leak_live -lprofiler -ltcmalloc
 g++ -g leak_live.cpp -o leak_live -ltcmalloc_and_profiler 
 
 ```
+
+![alt text](HeapProfilerStart%20symbol.png)
