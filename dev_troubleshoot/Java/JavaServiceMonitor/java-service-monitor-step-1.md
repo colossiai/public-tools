@@ -220,3 +220,39 @@ http://localhost:9090/graph
 ✅ You now have a **full stack**: Java → Micrometer → Prometheus → Grafana.
 
 ---
+
+
+## Extra metrics
+
+Micrometer automatically provides:
+
+**JVM Metrics:**
+
+* `jvm_memory_used_bytes`
+* `jvm_memory_max_bytes`
+* `jvm_threads_live`
+* `jvm_threads_daemon`
+* `jvm_gc_pause_seconds`
+
+**System Metrics:**
+
+* `process_cpu_usage`
+* `process_cpu_seconds_total`
+* `system_cpu_usage`
+* `system_memory_total_bytes`
+* `system_memory_free_bytes`
+
+No extra code is needed—just exposing `/actuator/prometheus` will include all these metrics.
+
+
+## Test CPU-load monitoring
+
+* add cpu-load logic
+
+* observe CPU high load via grafana
+
+![alt text](images/cpu-load.png)
+
+* and thread dump
+
+![alt text](images/thread-dump.png)
