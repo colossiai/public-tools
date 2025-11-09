@@ -56,7 +56,7 @@ java -Xmx256m MemoryLeakDemo
 This will **gradually consume heap memory** and eventually trigger a `java.lang.OutOfMemoryError`.
 
 
-![alt text](mem1.png)
+![alt text](images/mem1.png)
 
 
 ---
@@ -80,7 +80,7 @@ S0     S1     E      O      M     CCS   YGC   YGCT   FGC   FGCT    GCT
 
 `NOTE`: Look for **“O” (Old generation)** steadily increasing → possible leak.
 
-see [Mem leak monitoring - jstat](Mem leak monitoring - jstat.md)
+see [Mem leak monitoring - jstat](Mem_leak_monitoring_jstat.md)
 
 ---
 
@@ -112,7 +112,7 @@ Use **Eclipse MAT (Memory Analyzer Tool)**:
 This confirms the leak source.
 
 
-![alt text](mem2.png)
+![alt text](images/mem2.png)
 
 ---
 

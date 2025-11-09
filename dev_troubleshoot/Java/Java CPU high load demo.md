@@ -218,7 +218,7 @@ PID   USER   PR  NI  VIRT  RES  SHR S %CPU %MEM  TIME+   COMMAND
 Here `1755` is a Java thread ID in the OS (aka **native thread ID**).
 
 
-![alt text](cpu1.png)
+![alt text](images/cpu1.png)
 
 
 Convert it to **hexadecimal**, since Java thread dumps use hex thread IDs:
@@ -255,7 +255,7 @@ You might see something like:
         at java.lang.Thread.run(Thread.java:748)
 ```
 
-![alt text](cpu2.png)
+![alt text](images/cpu2.png)
 
 ✅ You’ve found the **exact function causing high CPU** (`Math.random()` in an infinite loop).
 
