@@ -104,7 +104,7 @@ g++ -O2 -std=c++17 cpu_spin.cpp -o cpu_spin -pthread
 
     Look for top functions:
 
-    ![alt text](perf-report-cpu_spin.png)
+    ![alt text](images/perf-report-cpu_spin.png)
 
 
    → The function `busy_worker()` will dominate CPU samples.

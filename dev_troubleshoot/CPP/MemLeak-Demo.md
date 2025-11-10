@@ -116,7 +116,7 @@ Each corresponds to the heap at different moments.
 
 `View single profile`
 
-![alt text](./mem-single-profile.png)
+![alt text](images/mem-single-profile.png)
 
 ### Note: `pprof --diff_base error: profiles have empty common sample type list`
 - Only diff profiles with the same sample types.
@@ -151,7 +151,7 @@ Interpretation:
 * Useful for identifying *growing leaks over time*.
 
 
-![alt text](./mem-pprof-base.png)
+![alt text](images/mem-pprof-base.png)
 
 `The output show that leak_memory() consume top memory`
 
