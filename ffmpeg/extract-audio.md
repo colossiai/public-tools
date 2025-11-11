@@ -1,36 +1,38 @@
 # How to extract m4a audio from 00:00:00 to 00:05:12
 
 
-To extract **M4A audio** from an MP4 between `00:00:00` and `00:05:12`, use this command:
+If your **input file is already an `.m4a`**, and you just want to extract a **segment (00:00:00–00:05:12)** from it, you can still use `ffmpeg` — just without video-related options.
+
+Here’s the correct command:
 
 ```bash
-ffmpeg -i input.mp4 -ss 00:00:00 -to 00:05:12 -vn -c:a copy output.m4a
+ffmpeg -i input.m4a -ss 00:00:00 -to 00:05:12 -c copy output.m4a
 ```
 
-### 🔍 Explanation:
+### Explanation:
 
-* `-i input.mp4` — input video file
-* `-ss 00:00:00` — start time
-* `-to 00:05:12` — end time
-* `-vn` — no video (audio only)
-* `-c:a copy` — copy the audio stream without re-encoding (fast & lossless)
-* `output.m4a` — your extracted audio file
+* `-i input.m4a` → your input M4A audio file.
+* `-ss 00:00:00` → start time.
+* `-to 00:05:12` → end time.
+* `-c copy` → copy the audio stream directly (no re-encoding).
+* `output.m4a` → output file name.
 
-✅ This command will:
+✅ **Fast and lossless**, since no re-encoding happens.
 
-* keep the **original audio quality**,
-* extract **only the audio track**,
-* and trim **exactly from 0:00 to 5:12**.
+---
 
-If you want to **re-encode** (for example, to ensure M4A AAC format compatibility), use:
+💡 **If you encounter a seek offset issue** (output starts slightly earlier or later), use this version instead:
 
 ```bash
-ffmpeg -i input.mp4 -ss 00:00:00 -to 00:05:12 -vn -c:a aac -b:a 192k output.m4a
+ffmpeg -ss 00:00:00 -to 00:05:12 -i input.m4a -c copy output.m4a
 ```
 
-This re-encodes the audio to AAC at 192 kbps.
+Here, placing `-ss` *before* the input makes seeking more accurate but slightly slower.
 
-# Extract mp4 video
+Would you like to keep metadata (title, artist, etc.) in the output too?
+
+
+# Extract audio from mp4 video
 
 
 You can extract audio from an MP4 between specific timestamps using this `ffmpeg` command:
