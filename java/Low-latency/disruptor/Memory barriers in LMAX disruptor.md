@@ -296,3 +296,222 @@ If you want, I can **draw a step-by-step timeline for 2 producers + 2 consumers*
 
 Do you want me to do that next?
 
+# Draw a step-by-step timeline for 2 producers + 2 consumers showing happens-before edges
+
+Nice, this is where the Disruptor really *clicks*. Let’s draw a **step-by-step timeline for 2 producers + 2 consumers** and explicitly label the **JMM happens-before edges**.
+
+Context: **LMAX Disruptor**, single ring buffer, multi-producer, multi-consumer.
+
+---
+
+## Cast of characters
+
+* **P1, P2** → producers
+* **C1, C2** → consumers
+* **cursor** → global `volatile long` tracking highest published sequence
+* **seq N** → logical event index in the ring buffer
+
+Assumptions:
+
+* Each slot has exactly **one producer**
+* `cursor` is the *only* publication point
+* Consumers poll `cursor` (volatile read)
+
+---
+
+## Step 0 — Initial state
+
+```text
+cursor = 9   (volatile)
+```
+
+All consumers have processed up to sequence 9.
+
+---
+
+## Step 1 — Producers claim slots (no visibility yet)
+
+```text
+P1 claims seq 10
+P2 claims seq 11
+```
+
+Important:
+
+* Slot claiming uses atomics, but **no data visibility yet**
+* No happens-before edges to consumers at this point
+
+---
+
+## Step 2 — Producers write event data (plain writes)
+
+```text
+P1 writes event[10].price = 100
+P1 writes event[10].qty   = 5
+
+P2 writes event[11].price = 101
+P2 writes event[11].qty   = 7
+```
+
+Still:
+
+* These are **normal writes**
+* Consumers must NOT see them yet
+* No happens-before edges exist yet
+
+---
+
+## Step 3 — P1 publishes seq 10 (volatile write)
+
+```text
+P1: cursor = 10   (volatile write)
+```
+
+### JMM happens-before edges created
+
+```text
+P1 event[10] writes
+        ↓
+volatile write(cursor = 10)
+```
+
+Rule used:
+
+> **All writes before a volatile write happen-before that volatile write**
+
+So now:
+
+* Event 10 is *safe to read*
+* Event 11 is **not** visible yet
+
+---
+
+## Step 4 — Consumers observe cursor = 10 (volatile read)
+
+```text
+C1 reads cursor → 10
+C2 reads cursor → 10
+```
+
+### Happens-before chain
+
+```text
+P1 event[10] writes
+        ↓
+volatile write(cursor = 10)
+        ↓
+volatile read(cursor = 10)
+        ↓
+C1 / C2 read event[10]
+```
+
+Rule used:
+
+> **Volatile write → volatile read creates a happens-before edge**
+
+✅ Both consumers can safely read **event 10**
+❌ Neither consumer can read event 11 yet
+
+---
+
+## Step 5 — P2 publishes seq 11 (volatile write)
+
+```text
+P2: cursor = 11   (volatile write)
+```
+
+### Happens-before edges
+
+```text
+P2 event[11] writes
+        ↓
+volatile write(cursor = 11)
+```
+
+This does **not** disturb event 10 — ordering is preserved.
+
+---
+
+## Step 6 — Consumers observe cursor = 11
+
+```text
+C1 reads cursor → 11
+C2 reads cursor → 11
+```
+
+### Full happens-before chain
+
+```text
+P2 event[11] writes
+        ↓
+volatile write(cursor = 11)
+        ↓
+volatile read(cursor = 11)
+        ↓
+C1 / C2 read event[11]
+```
+
+Now both consumers can safely process **event 11**.
+
+---
+
+## Entire timeline (compressed view)
+
+```text
+Time ↓
+
+P1: write event[10] data
+P1: volatile write cursor=10
+           ↓ HB
+C1/C2: volatile read cursor=10 → read event[10]
+
+P2: write event[11] data
+P2: volatile write cursor=11
+           ↓ HB
+C1/C2: volatile read cursor=11 → read event[11]
+```
+
+---
+
+## Why this works with *multiple* producers
+
+Key insight:
+
+> **Only the cursor is shared across producers and consumers**
+
+Each producer:
+
+* Writes to a **unique slot**
+* Publishes via a **single volatile write**
+
+JMM guarantees:
+
+* Volatile writes are **totally ordered**
+* Consumers see cursor updates **in order**
+* Data visibility follows that order
+
+This gives you:
+
+* No locks
+* No torn reads
+* No out-of-order visibility
+* Fully deterministic happens-before graph
+
+---
+
+## The one-sentence invariant
+
+> **If a consumer sees cursor ≥ N, then all writes to event N happened-before that read.**
+
+That’s the Disruptor’s entire correctness model, expressed *purely* in JMM terms.
+
+---
+
+If you want next:
+
+* Add **gating sequences** (consumer → producer happens-before)
+* Show what breaks if `cursor` is *not* volatile
+* Or compare this exact timeline to `BlockingQueue.put/take`
+
+Just say the word 👀
+
