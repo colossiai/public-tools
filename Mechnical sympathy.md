@@ -139,3 +139,263 @@ If you'd like, I can next show:
 * Or how JVM JIT interacts with mechanical sympathy
 
 Which direction do you want?
+
+# A practical mechanical sympathy checklist for Java low-latency bots
+
+Since you're building **Java low-latency bots**, here’s a **practical, production-oriented mechanical sympathy checklist** — optimized for trading/market-data style workloads (µs–ms sensitive).
+
+I’ll group it by layer so you can use it as a deployment review sheet.
+
+---
+
+# 🧠 1. CPU & Core Usage
+
+### ✅ Single Writer Principle
+
+* One thread owns a data structure.
+* Avoid multiple writers to same memory region.
+* Reduces cache coherency traffic.
+
+### ✅ Core Pinning
+
+* Pin critical threads to dedicated cores.
+* Avoid context switching.
+* Use `taskset`, `cset shield`, or `isolcpus`.
+
+### ✅ Avoid Oversubscription
+
+* `#hot threads ≤ physical cores`
+* Do NOT count hyperthreads as real cores for critical paths.
+
+### ✅ Busy Spin for Critical Path
+
+* Use busy-spin instead of blocking for ultra-low latency.
+* Example: Disruptor `BusySpinWaitStrategy`.
+
+Used in:
+
+* LMAX Disruptor
+* Aeron
+
+---
+
+# 🧵 2. Threading & Concurrency
+
+### ❌ Avoid
+
+* `synchronized`
+* `ReentrantLock`
+* Contended `Atomic*`
+* Thread pools on hot path
+
+### ✅ Prefer
+
+* Lock-free ring buffers
+* Single producer / single consumer queues
+* `LongAdder` over `AtomicLong` for counters
+* Pre-allocated executors
+
+### ⚠ False Sharing Prevention
+
+* Pad frequently updated fields
+* Use `@Contended` (with JVM flag)
+
+False sharing = different threads modifying variables on the same 64-byte cache line → massive performance drop.
+
+---
+
+# 💾 3. Memory & GC
+
+### ✅ Allocation Discipline
+
+* Zero allocations on hot path
+* Reuse objects
+* Pre-size collections
+* Avoid boxing
+
+Bad:
+
+```java
+new BigDecimal(price)
+```
+
+Better:
+
+```java
+long priceTicks
+```
+
+---
+
+### ✅ Choose the Right GC
+
+For low-latency bots:
+
+* G1 (tuned) → most common
+* ZGC → predictable pauses
+* Shenandoah → ultra low pause
+
+Avoid:
+
+* Parallel GC for latency-sensitive bots
+
+---
+
+### ✅ Heap Sizing
+
+* Fixed heap size:
+
+```
+-Xms = -Xmx
+```
+
+* Prevent heap resizing pauses
+
+---
+
+### ✅ Off-Heap for Critical Buffers
+
+* `DirectByteBuffer`
+* Unsafe / MemorySegment (Panama)
+* Chronicle libraries
+
+Used by:
+
+* Chronicle Queue
+
+---
+
+# 🧮 4. Data Structures
+
+### ✅ Prefer
+
+* Arrays over LinkedList
+* Primitive collections (fastutil, HPPC)
+* Flat objects (avoid deep object graphs)
+
+### ❌ Avoid
+
+* `HashMap` in hot path (unless pre-sized)
+* Streams API in critical loops
+* Reflection
+
+---
+
+# 🔥 5. JIT & JVM Behavior
+
+### ✅ Warmup Phase
+
+* Always warm up before measuring.
+* Let C2 JIT optimize hot methods.
+
+### ✅ Keep Methods Small
+
+* JVM inlining limit matters.
+* Avoid megamorphic call sites.
+
+### ✅ Avoid Exception-Based Flow
+
+Exceptions are slow on hot path.
+
+---
+
+# 🌐 6. Networking
+
+### ✅ Use
+
+* TCP_NODELAY
+* SO_REUSEADDR
+* SO_RCVBUF tuned
+
+### ✅ Kernel Tuning
+
+Linux production checklist:
+
+* `net.core.rmem_max`
+* `net.core.wmem_max`
+* `net.ipv4.tcp_low_latency=1`
+* Disable Transparent Huge Pages
+* Disable CPU frequency scaling
+* Set `performance` governor
+
+---
+
+# 💽 7. Disk / Persistence
+
+If journaling:
+
+* Use sequential writes
+* Memory-mapped files
+* Avoid fsync on hot path (batch instead)
+
+Mechanical sympathy systems:
+
+* Chronicle Queue
+* Aeron Archive
+
+---
+
+# 📊 8. Measurement Discipline
+
+### ✅ Measure Correctly
+
+* Use JMH for microbenchmarks
+* Measure p99 / p999 latency
+* Never trust averages
+
+### ✅ Observe
+
+* `perf`
+* `async-profiler`
+* GC logs
+* CPU cache misses
+
+---
+
+# 🧊 9. Avoid Latency Killers
+
+| Killer              | Why                  |
+| ------------------- | -------------------- |
+| Logging on hot path | Syscalls             |
+| JSON serialization  | Allocation + parsing |
+| DNS lookup          | Blocking             |
+| Blocking I/O        | Context switch       |
+| GC promotion        | STW pause            |
+| Page faults         | µs–ms spike          |
+
+---
+
+# ⚙️ 10. Production Runtime Checklist
+
+* [ ] Dedicated machine (no noisy neighbors)
+* [ ] Isolated cores
+* [ ] Fixed heap size
+* [ ] Disabled swap
+* [ ] HugePages tuned
+* [ ] Monitoring p99 latency
+* [ ] GC pause < SLA
+* [ ] No allocation in matching loop
+* [ ] No locks in hot path
+* [ ] Warmed-up before trading session
+
+---
+
+# 🎯 Mechanical Sympathy Mindset
+
+Always ask:
+
+* Is this contiguous in memory?
+* Is this predictable for branch predictor?
+* Will this cause cache line bouncing?
+* Will this allocate?
+* Will this block?
+
+---
+
+Since you're working on **low-latency bot deployment**, if you want I can next give you:
+
+* A concrete JVM startup template for production trading bots
+* A Linux tuning checklist (copy-paste ready)
+* Or a “latency debugging playbook” for p99 spikes
+
+Pick one.
