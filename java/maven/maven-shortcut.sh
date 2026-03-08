@@ -314,3 +314,109 @@ echo "./build_install.sh"
 echo "./run.sh"
 
 }
+
+
+mvn_new_module() {
+    # Arguments
+    MODULE_NAME=$1
+    MAIN_CLASS_NAME=${2:-Main}
+
+    if [ -z "$MODULE_NAME" ]; then
+        echo "Usage: mvn_new_module <module-name> [MainClassName]"
+        return 1
+    fi
+
+    PARENT_POM="pom.xml"
+    if [ ! -f "$PARENT_POM" ]; then
+        echo "Error: Cannot find parent pom.xml in current directory"
+        return 1
+    fi
+
+    # Auto-detect groupId from parent pom.xml
+    GROUP_ID=$(grep -m1 '<groupId>' "$PARENT_POM" | sed 's/.*<groupId>\(.*\)<\/groupId>.*/\1/')
+    if [ -z "$GROUP_ID" ]; then
+        echo "Error: Cannot detect groupId from parent pom.xml"
+        return 1
+    fi
+
+    # Detect artifactId and version
+    ARTIFACT_ID=$(grep -m1 '<artifactId>' "$PARENT_POM" | sed 's/.*<artifactId>\(.*\)<\/artifactId>.*/\1/')
+    VERSION=$(grep -m1 '<version>' "$PARENT_POM" | sed 's/.*<version>\(.*\)<\/version>.*/\1/')
+
+    echo "Detected groupId: $GROUP_ID"
+    echo "Creating new module: $MODULE_NAME with main class $MAIN_CLASS_NAME"
+
+    PACKAGE_PATH=$(echo $GROUP_ID | tr '.' '/')
+    FULL_CLASS_NAME="$GROUP_ID.$MODULE_NAME.$MAIN_CLASS_NAME"
+
+    # create folder structure
+    mkdir -p "$MODULE_NAME/src/main/java/$PACKAGE_PATH/$MODULE_NAME"
+    mkdir -p "$MODULE_NAME/src/test/java/$PACKAGE_PATH/$MODULE_NAME"
+
+    # create pom.xml with shade plugin
+    cat > "$MODULE_NAME/pom.xml" <<EOF
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>$GROUP_ID</groupId>
+    <artifactId>$ARTIFACT_ID</artifactId>
+    <version>$VERSION</version>
+  </parent>
+
+  <artifactId>$MODULE_NAME</artifactId>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.5.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals><goal>shade</goal></goals>
+            <configuration>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>$FULL_CLASS_NAME</mainClass>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
+EOF
+
+    # create main java class
+    cat > "$MODULE_NAME/src/main/java/$PACKAGE_PATH/$MODULE_NAME/$MAIN_CLASS_NAME.java" <<EOF
+package $GROUP_ID.$MODULE_NAME;
+
+public class $MAIN_CLASS_NAME {
+    public static void main(String[] args) {
+        System.out.println("Hello from $FULL_CLASS_NAME!");
+    }
+}
+EOF
+
+    # add module to parent pom if not exists
+    if ! grep -q "<module>$MODULE_NAME</module>" "$PARENT_POM"; then
+        sed -i.bak "/<\/modules>/i\\
+    <module>$MODULE_NAME</module>
+" "$PARENT_POM"
+        rm "$PARENT_POM.bak"
+    fi
+
+    echo "Module $MODULE_NAME created successfully."
+    echo "Build: mvn clean package -pl $MODULE_NAME -am"
+    echo "Run: java -jar $MODULE_NAME/target/$MODULE_NAME-1.0-SNAPSHOT.jar"
+}
