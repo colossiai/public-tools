@@ -2,13 +2,13 @@
 
 # mvn archetype:generate -DgroupId=com.cruiser -DartifactId=mvn_cmd_demo -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
 
-create_maven_project() {
+mvn_init() {
     local group_id="$1"
     local artifact_id="$2"
 
     # Validate input parameters
     if [[ -z "$group_id" || -z "$artifact_id" ]]; then
-        echo "Usage: create_maven_project <groupId> <artifactId>"
+        echo "Usage: mvn_init <groupId> <artifactId>"
         return 1
     fi
 
@@ -64,4 +64,253 @@ mvn_exec() {
     fi
 
     "$mvnCmd" exec:java -Dexec.mainClass="$mainClass"
+}
+
+
+mvn_multi_init() {
+
+PROJECT_NAME=${1:-demo-mvn-project}
+GROUP_ID=${2:-com.example}
+VERSION="1.0-SNAPSHOT"
+
+PACKAGE_PATH=$(echo $GROUP_ID | tr '.' '/')
+
+echo "Creating Maven multi-module project: $PROJECT_NAME"
+
+mkdir -p "$PROJECT_NAME"
+cd "$PROJECT_NAME" || return
+
+################################
+# .gitignore
+################################
+
+cat > .gitignore <<EOF
+target/
+*.log
+.idea/
+.vscode/
+*.iml
+EOF
+
+################################
+# Parent pom.xml
+################################
+
+cat > pom.xml <<EOF
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+<modelVersion>4.0.0</modelVersion>
+
+<groupId>$GROUP_ID</groupId>
+<artifactId>$PROJECT_NAME</artifactId>
+<version>$VERSION</version>
+
+<packaging>pom</packaging>
+
+<modules>
+    <module>common</module>
+    <module>service</module>
+</modules>
+
+<properties>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
+</properties>
+
+</project>
+EOF
+
+################################
+# Module creator
+################################
+
+create_module() {
+
+MODULE=$1
+
+mkdir -p "$MODULE/src/main/java/$PACKAGE_PATH/$MODULE"
+mkdir -p "$MODULE/src/test/java/$PACKAGE_PATH/$MODULE"
+
+cat > "$MODULE/pom.xml" <<EOF
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+<modelVersion>4.0.0</modelVersion>
+
+<parent>
+    <groupId>$GROUP_ID</groupId>
+    <artifactId>$PROJECT_NAME</artifactId>
+    <version>$VERSION</version>
+</parent>
+
+<artifactId>$MODULE</artifactId>
+
+</project>
+EOF
+
+}
+
+################################
+# Create modules
+################################
+
+create_module common
+create_module service
+
+################################
+# service depends on common
+################################
+
+sed -i.bak '/<\/project>/d' service/pom.xml
+
+cat >> service/pom.xml <<EOF
+
+<dependencies>
+    <dependency>
+        <groupId>$GROUP_ID</groupId>
+        <artifactId>common</artifactId>
+        <version>\${project.version}</version>
+    </dependency>
+</dependencies>
+
+
+<build>
+    <plugins>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.5.1</version>
+
+        <executions>
+            <execution>
+                <phase>package</phase>
+                <goals>
+                <goal>shade</goal>
+                </goals>
+
+                <configuration>
+
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+
+                    <transformers>
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                        <mainClass>$MAIN_CLASS</mainClass>
+                        </transformer>
+                    </transformers>
+
+                </configuration>
+
+            </execution>
+        </executions>
+    </plugin>
+    </plugins>
+</build>
+
+
+</project>
+EOF
+
+rm service/pom.xml.bak
+
+################################
+# Sample Common Class
+################################
+
+cat > common/src/main/java/$PACKAGE_PATH/common/StringUtils.java <<EOF
+package $GROUP_ID.common;
+
+public class StringUtils {
+
+    public static String upper(String s) {
+        return s == null ? null : s.toUpperCase();
+    }
+
+}
+EOF
+
+################################
+# Service with demo main()
+################################
+
+cat > service/src/main/java/$PACKAGE_PATH/service/UserService.java <<EOF
+package $GROUP_ID.service;
+
+import $GROUP_ID.common.StringUtils;
+
+public class UserService {
+
+    public String normalizeName(String name) {
+        return StringUtils.upper(name);
+    }
+
+    public static void main(String[] args) {
+
+        UserService service = new UserService();
+
+        String input = "uranus";
+        String output = service.normalizeName(input);
+
+        System.out.println("Input : " + input);
+        System.out.println("Output: " + output);
+    }
+}
+EOF
+
+################################
+# build_install.sh
+################################
+
+cat > build_install.sh <<EOF
+#!/usr/bin/env bash
+set -e
+
+echo "Building & install project: mvn clean install"
+
+mvn clean install
+
+echo "Build finished."
+EOF
+
+################################
+# run.sh
+################################
+
+MAIN_CLASS="$GROUP_ID.service.UserService"
+
+cat > run.sh <<EOF
+#!/usr/bin/env bash
+set -e
+
+echo "Running $MAIN_CLASS"
+
+# java -cp \
+# service/target/service-$VERSION.jar:\
+# common/target/common-$VERSION.jar \
+# $MAIN_CLASS
+
+java -jar service/target/service-$VERSION.jar
+EOF
+
+chmod +x build_install.sh
+chmod +x run.sh
+
+################################
+# Git init
+################################
+
+git init >/dev/null 2>&1 || true
+
+echo ""
+echo "Project created successfully."
+echo ""
+echo "Next steps:"
+echo "cd $PROJECT_NAME"
+echo "./build_install.sh"
+echo "./run.sh"
+
 }
