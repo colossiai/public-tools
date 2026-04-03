@@ -1,3 +1,5 @@
+# Save into .git/hooks/pre-push
+
 # branch name starts with "local/" are not allowed to push
 
 #!/bin/sh
