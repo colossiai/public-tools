@@ -1,4 +1,3 @@
-
 ts() {
   local fmt="%Y-%m-%d %H:%M:%S"
   local help="Usage: ts [time]
@@ -74,7 +73,9 @@ Examples:
 
   # yyyy-MM-dd
   if [[ "$in" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
-    local sec=$(date -u -j -f "%Y-%m-%d" "$in" +%s)
+    # BSD `date -j -f "%Y-%m-%d"` leaves H/M/S at the current wall-clock
+    # value; pin them to 00:00:00 by reusing the full format.
+    local sec=$(date -u -j -f "%Y-%m-%d %H:%M:%S" "$in 00:00:00" +%s)
     format_output "$sec" "000"
     return
   fi
