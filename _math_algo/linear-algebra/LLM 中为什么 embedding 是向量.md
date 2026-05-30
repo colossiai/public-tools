@@ -174,7 +174,10 @@ Transformer 本质上疯狂做：
 y = Wx
 ```
 
-genui{"math_block_widget_always_prefetch_v2":{"content":"y=Wx"}}
+```math
+\mathbf{y} = W\mathbf{x}
+```
+
 
 如果 embedding 是向量：
 
