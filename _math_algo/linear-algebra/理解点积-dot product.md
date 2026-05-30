@@ -1106,3 +1106,13 @@ eigenvector =
 > SVD / PCA / attention heads 为什么会“自动学 basis”
 
 那会直接把“LLM 为什么能学语义结构”讲通。
+
+
+# 点积直观理解png
+
+![alt text](images/点积直观理解.png)
+
+
+# 点积是矩阵乘法-单位向量形式.png
+
+![alt text](images/点积是矩阵乘法-单位向量形式.png)
