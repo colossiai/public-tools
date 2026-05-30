@@ -46,11 +46,11 @@ $$
 
 点积：
 
-$$
+```math
 \mathbf a\cdot\mathbf b
 =
 a_xb_x+a_yb_y
-$$
+```
 
 比如：
 
@@ -86,13 +86,13 @@ $$
 
 真正理解点积要看这个公式：
 
-$$
+```math
 \mathbf a\cdot\mathbf b
 =
 \|\mathbf a\|
 \|\mathbf b\|
 \cos\theta
-$$
+```
 
 这里：
 
