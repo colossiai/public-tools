@@ -727,3 +727,382 @@ Q_i · K_j
 > “projection → basis → linear transformation → eigenvector”
 
 这一整条线用**LLM embedding 的视角串起来**，那会直接打通线性代数的核心直觉。
+
+
+# 请串起来 projection → basis → linear transformation → eigenvector
+
+
+很好，这一条链其实是**线性代数的“世界观主线”**，也是你理解 embedding / attention / 甚至模型内部表示空间的关键。
+
+我用一条连续故事把它串起来：
+
+---
+
+# 一条主线：projection → basis → linear transformation → eigenvector
+
+核心一句话先给你：
+
+> **线性代数 = 在不同“观察方向（basis）”下，用 projection 描述空间，并研究这些描述如何被 transformation 改写，而 eigenvector 是“不会被改方向的特殊结构”。**
+
+---
+
+# 1. Projection：你在“问方向问题”
+
+先回到最基本的操作：
+
+> projection = 一个向量在某个方向上有多少
+
+```text
+      b
+     /
+    /
+---/------> a
+```
+
+数学：
+
+```math
+\text{proj}_a(b) = \frac{b \cdot a}{\|a\|}
+```
+
+直觉：
+
+> 你不是在看 b 本身，而是在问：
+>
+> ❗“b 在 a 这个方向上有多少？”
+
+---
+
+## projection 的本质
+
+projection = **测量**
+
+> “某个方向上的分量”
+
+---
+
+# 2. Basis：一组“测量方向的标准尺子”
+
+现在关键升级来了：
+
+## 2.1 什么是 basis？
+
+在二维空间，你可以选：
+
+标准 basis：
+
+```text
+e1 = (1,0)
+e2 = (0,1)
+```
+
+任何向量：
+
+```math
+x = (x1, x2)
+```
+
+其实就是：
+
+```math
+x = x1 e1 + x2 e2
+```
+
+---
+
+## 2.2 关键理解
+
+> basis = 你用来做 projection 的“坐标方向”
+
+换句话说：
+
+* projection = 测量
+* basis = 测量标准（尺子方向）
+
+---
+
+## 2.3 一个更深的视角
+
+一个向量不是“存在的东西”，而是：
+
+> ❗“在某个 basis 下的 projection 组合”
+
+---
+
+## 2.4 LLM 类比（非常关键）
+
+embedding 向量：
+
+```text
+cat = [0.2, 0.7, -0.1, ...]
+```
+
+其实是：
+
+> cat 在一组“语义 basis”上的 projection
+
+比如：
+
+* animal-ness 方向
+* cuteness 方向
+* domestic-ness 方向
+
+---
+
+# 3. Linear transformation：改变“空间的规则”
+
+现在进入核心：
+
+## 3.1 什么是 linear transformation？
+
+```math
+y = A x
+```
+
+意思：
+
+> 把一个向量 x 变成另一个向量 y
+
+---
+
+## 3.2 从 projection 角度看
+
+矩阵 A：
+
+```text
+A =
+[ a b ]
+[ c d ]
+```
+
+作用：
+
+```text
+y1 = a x1 + b x2
+y2 = c x1 + d x2
+```
+
+注意：
+
+> 每一行都是一次 projection！
+
+---
+
+## 3.3 本质理解
+
+linear transformation =
+
+> ❗“重新定义 projection 的方式”
+
+或者更直白：
+
+> ❗“换了一套 basis 的空间变形规则”
+
+---
+
+## 3.4 几何图像
+
+```text
+原来的网格：
+
+□ □ □
+
+变换后：
+
+◇ ◇ ◇
+  ◇ ◇
+```
+
+点被“拉伸 / 旋转 / 压缩”
+
+---
+
+## 3.5 LLM 视角
+
+attention / MLP layer：
+
+> 都是在做 linear transformation
+
+意思：
+
+> embedding 空间被不断“重组 projection 结构”
+
+---
+
+# 4. Eigenvector：不会被“方向改变”的向量
+
+现在来到最核心概念。
+
+---
+
+## 4.1 定义
+
+```math
+A v = \lambda v
+```
+
+意思：
+
+> 经过 transformation 后，v 仍然在同一条方向上，只是长度变了
+
+---
+
+## 4.2 直觉（非常重要）
+
+一般向量：
+
+```text
+x → A x → 方向变了
+```
+
+但 eigenvector：
+
+```text
+v → A v → 方向不变
+```
+
+只有：
+
+* 拉长
+* 缩短
+
+---
+
+## 4.3 图像理解
+
+```text
+普通向量：
+
+→ 变方向
+
+eigenvector：
+
+→→→（同方向拉伸）
+```
+
+---
+
+## 4.4 本质
+
+eigenvector =
+
+> ❗“这个 transformation 不改变它的 projection 结构”
+
+或者更深：
+
+> ❗“空间中最稳定的方向”
+
+---
+
+## 4.5 为什么会有 eigenvector？
+
+因为：
+
+> linear transformation 本质是“重组 projection”
+
+但有些方向：
+
+> projection 重组后仍然只放大/缩小，不改变方向
+
+---
+
+# 5. 四者统一（最重要总结）
+
+现在把整条链压成一个系统：
+
+---
+
+## 5.1 projection
+
+> 在某个方向上“测量多少”
+
+---
+
+## 5.2 basis
+
+> 一组用来做 projection 的标准方向（坐标系统）
+
+---
+
+## 5.3 linear transformation
+
+> 改变“projection 规则”的操作（重写空间）
+
+---
+
+## 5.4 eigenvector
+
+> 在 transformation 下仍保持方向不变的“稳定 projection 方向”
+
+---
+
+# 6. 一条完整世界观（非常重要）
+
+你可以这样记：
+
+> **线性代数 = 用 projection 描述世界**
+
+然后：
+
+* basis = 选择哪些方向来做 projection
+* vector = projection 的集合
+* matrix = 改变 projection 规则的机器
+* eigenvector = 在规则改变后仍稳定的方向
+
+---
+
+# 7. 统一到 LLM（关键收束）
+
+现在你会看到一个非常深的统一：
+
+---
+
+## 7.1 embedding
+
+= projection in semantic basis
+
+---
+
+## 7.2 attention
+
+= dot product = projection similarity
+
+---
+
+## 7.3 linear layers
+
+= change basis / change projection geometry
+
+---
+
+## 7.4 eigenvector（隐含意义）
+
+在深层网络里：
+
+> 一些稳定语义方向会“反复出现”
+
+类似：
+
+* sentiment direction
+* factuality direction
+* syntax direction
+
+这些就是：
+
+> “近似 eigen-directions”
+
+---
+
+# 8. 最终一句话（核心压缩）
+
+如果只记一句：
+
+> **projection 是测量方向，basis 是测量系统，linear transformation 是重写测量规则，eigenvector 是规则下不变的稳定方向。**
+
+---
+
+如果你愿意，我可以下一步帮你把这条链继续扩展到：
+
+> SVD / PCA / attention heads 为什么会“自动学 basis”
+
+那会直接把“LLM 为什么能学语义结构”讲通。
