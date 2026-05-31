@@ -57,7 +57,9 @@ token → embedding vector
 
 你刚刚问的这个。
 
-genui{"math_block_widget_always_prefetch_v2":{"content":"y=Wx+b"} }
+```math
+y=Wx+b
+```
 
 必须理解：
 

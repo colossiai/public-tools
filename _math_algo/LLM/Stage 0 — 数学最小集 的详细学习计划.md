@@ -35,7 +35,9 @@ gradient update
 2. attention 为什么用点积
 3. 为什么：
 
-genui{"math_block_widget_always_prefetch_v2":{"content":"y=Wx+b"}}
+```math
+y=Wx+b
+```
 
 是在做空间变换
 
@@ -172,7 +174,9 @@ king queen
 
 必须理解：
 
-genui{"math_block_widget_always_prefetch_v2":{"content":"y=Wx"}}
+```math
+y=Wx
+```
 
 意思：
 
