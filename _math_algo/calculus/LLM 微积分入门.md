@@ -96,7 +96,9 @@ loss = 错多少
 
 先理解：
 
+```math
 f'(x)=\lim_{h\to0}\frac{f(x+h)-f(x)}{h}
+```
 
 本质：
 
@@ -104,11 +106,16 @@ f'(x)=\lim_{h\to0}\frac{f(x+h)-f(x)}{h}
 
 例如：
 
-genui{"math_block_widget_always_prefetch_v2":{"content":"y=x^2"}}
+```math
+y=x^2
+```
 
 导数：
 
+```math
 \frac{dy}{dx}=2x
+```
+
 
 意思：
 
@@ -150,7 +157,9 @@ L(w)
 
 所以求：
 
+```math
 \frac{dL}{dw}
+```
 
 意思：
 
@@ -206,15 +215,21 @@ L(w1,w2,w3,...)
 
 例如：
 
+```math
 L(x,y)=x^2+y^2
+```
 
 偏导：
 
+```math
 \frac{\partial L}{\partial x}=2x
+```
 
 和：
 
+```math
 \frac{\partial L}{\partial y}=2y
+```
 
 在 LLM：
 
@@ -244,7 +259,10 @@ embedding weight
 
 把所有偏导组合：
 
+```math
 \nabla L=\left(\frac{\partial L}{\partial w_1},\frac{\partial L}{\partial w_2},...,\frac{\partial L}{\partial w_n}\right)
+```
+
 
 这叫：
 
@@ -274,7 +292,9 @@ PyTorch 的 Adam）做：
 
 核心公式：
 
+```math
 w_{new}=w-\eta\nabla L
+```
 
 其中：
 
@@ -338,7 +358,9 @@ w
 
 > chain rule
 
+```math
 \frac{dL}{dw}=\frac{dL}{dh}\frac{dh}{dg}\frac{dg}{df}\frac{df}{dw}
+```
 
 意思：
 
@@ -383,7 +405,9 @@ gradient vanishing
 
 attention：
 
+```math
 \text{softmax}(x_i)=\frac{e^{x_i}}{\sum_j e^{x_j}}
+```
 
 为什么用：
 
@@ -409,7 +433,9 @@ score 大一点：
 
 关键：
 
+```math
 \frac{d}{dx}e^x=e^x
+```
 
 非常容易训练。
 
