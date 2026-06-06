@@ -486,7 +486,10 @@ def mha(x, Wq, Wk, Wv, Wo, num_heads):
 
 从数学角度看，Multi-Head Attention 最重要的一行就是：
 
+```math
 \mathrm{Attention}(Q,K,V)=\mathrm{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
+```
+
 
 而 Multi-Head 只是把这套计算并行做很多次：
 

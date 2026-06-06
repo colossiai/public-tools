@@ -176,7 +176,9 @@ token j
 
 Transformer 原论文：
 
+```math
 \frac{QK^T}{\sqrt{d_k}}
+```
 
 ```python
 scores = scores / np.sqrt(d_k)
@@ -296,7 +298,7 @@ AI     0.06 0.16 0.78
 Attention(Q,K,V)=Softmax(QK^T/\sqrt{d_k})V
 ```
 
-Attention(Q,K,V)=Softmax\left(\frac{QK^T}{\sqrt{d_k}}\right)V
+Attention(Q,K,V)=$Softmax\left(\frac{QK^T}{\sqrt{d_k}}\right)V$
 
 代码：
 

@@ -280,7 +280,10 @@ Linear1
 
 更新：
 
+```math
 W_{new}=W-\eta\frac{\partial Loss}{\partial W}
+```
+
 
 其中：
 
