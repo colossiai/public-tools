@@ -1,0 +1,13 @@
+[project]
+name = "dp-tutorial-claude"
+version = "0.1.0"
+description = "零基础动态规划入门教程：每个知识点一个可运行的 Python 文件 + 可视化"
+requires-python = ">=3.10"
+dependencies = [
+    "matplotlib>=3.8",
+    "networkx>=3.2",
+    "numpy>=1.26",
+]
+
+[tool.uv]
+package = false
