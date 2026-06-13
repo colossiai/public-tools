@@ -1,0 +1,36 @@
+{
+  "name": "ts-study",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "tsx": "tsx",
+    "typecheck": "tsc --noEmit",
+    "01": "tsx src/01-types-and-variables.ts",
+    "02": "tsx src/02-functions.ts",
+    "03": "tsx src/03-objects-and-interfaces.ts",
+    "04": "tsx src/04-unions-and-narrowing.ts",
+    "05": "tsx src/05-arrays-tuples-readonly.ts",
+    "06": "tsx src/06-generics.ts",
+    "07": "tsx src/07-classes.ts",
+    "08": "tsx src/08-enums-vs-const.ts",
+    "09": "tsx src/09-utility-types.ts",
+    "10": "tsx src/10-modules.ts",
+    "11": "tsx src/11-keyof-and-mapped-types.ts",
+    "12": "tsx src/12-conditional-types-and-infer.ts",
+    "13": "tsx src/13-template-literal-types.ts",
+    "14": "tsx src/14-type-predicates-and-asserts.ts",
+    "15": "tsx src/15-declaration-merging.ts",
+    "16": "tsx src/16-branded-nominal-types.ts",
+    "17": "tsx src/17-variance-and-function-types.ts",
+    "18": "tsx src/18-builder-pattern-with-phantom-state.ts",
+    "19": "tsx src/19-tsconfig-strictness-flags.ts",
+    "20": "tsx src/20-decorators.ts",
+    "all": "for f in src/[0-9][0-9]-*.ts; do echo \"\\n=== $f ===\"; tsx \"$f\" || exit 1; done"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}
