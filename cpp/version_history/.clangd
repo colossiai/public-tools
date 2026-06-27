@@ -1,0 +1,26 @@
+# Per-file C++ standard so clangd stops flagging newer-standard features.
+# Each demo targets a specific standard; match by filename.
+If:
+  PathMatch: .*cpp14\.cpp
+CompileFlags:
+  Add: [-std=c++14]
+---
+If:
+  PathMatch: .*cpp17\.cpp
+CompileFlags:
+  Add: [-std=c++17]
+---
+If:
+  PathMatch: .*cpp20\.cpp
+CompileFlags:
+  Add: [-std=c++20]
+---
+If:
+  PathMatch: .*cpp23\.cpp
+CompileFlags:
+  Add: [-std=c++23]
+---
+If:
+  PathMatch: .*cpp26\.cpp
+CompileFlags:
+  Add: [-std=c++26]
