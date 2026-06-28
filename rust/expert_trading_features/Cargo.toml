@@ -1,0 +1,24 @@
+[package]
+name = "expert_trading_features"
+version = "0.1.0"
+edition = "2021"
+description = "Low-latency trading techniques in Rust — a companion to cpp/expert_trading_features"
+publish = false
+
+# Each demo lives in examples/NN_topic.rs:
+#   cargo run --release --example 02_spsc_ring_buffer
+# Embedded tests:
+#   cargo test --examples
+# Benchmarks (std-only harness, see benches/bench_all.rs):
+#   cargo bench
+
+[[bench]]
+name = "bench_all"
+harness = false
+
+[profile.release]
+opt-level = 3
+codegen-units = 1
+[profile.bench]
+opt-level = 3
+codegen-units = 1
