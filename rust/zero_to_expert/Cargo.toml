@@ -1,0 +1,25 @@
+[package]
+name = "zero_to_expert"
+version = "0.1.0"
+edition = "2021"
+description = "Rust from zero to expert — runnable, self-contained teaching demos"
+publish = false
+
+# Each demo lives in examples/NN_topic.rs and is run with:
+#   cargo run --example NN_topic
+# Tests embedded in the examples run with:
+#   cargo test --examples
+# Optimized build for the benchmark-bearing demos:
+#   cargo run --release --example 15_typestate_and_zerocost
+
+# The benchmark harness behind bench_intel_mac/. std-only (no criterion), so it
+# uses its own main() instead of libtest:
+#   cargo bench
+[[bench]]
+name = "bench_all"
+harness = false
+
+[profile.release]
+opt-level = 3
+[profile.bench]
+opt-level = 3
