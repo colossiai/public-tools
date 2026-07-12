@@ -1,0 +1,14 @@
+[package]
+name = "rust_unique_features"
+version = "0.1.0"
+edition = "2021"
+description = "Rust's unique features, for experienced C++/Java/Go developers — runnable contrast demos"
+publish = false
+
+# Each demo lives in examples/NN_topic.rs and is run with:
+#   cargo run --example 01_ownership_and_borrowing
+# Build/check every demo at once:
+#   cargo build --examples
+
+[profile.release]
+opt-level = 3
