@@ -1,0 +1,24 @@
+[project]
+name = "ecommerce-hybrid-search"
+version = "0.1.0"
+description = "电商混合检索的 PostgreSQL 单体参考实现：L0 属性抽取 → L1 query 理解 → L2 多路召回 → L3 RRF → L4 重排 → L5 业务排序 → L6 评估"
+requires-python = ">=3.10"
+dependencies = [
+    "psycopg[binary]>=3.1",
+    "numpy>=1.26",
+    "jieba>=0.42",
+    "python-dotenv>=1.0",
+    "anthropic>=0.40",
+]
+
+# 本地真实模型（BGE embedding + cross-encoder 重排）。
+# 会拉进 torch，安装体积大，所以放 extra：
+#     uv sync --extra local
+# 不装也能跑：EMBEDDING_BACKEND 自动降级到 hash 伪向量。
+[project.optional-dependencies]
+local = [
+    "sentence-transformers>=3.0",
+]
+
+[tool.uv]
+package = false

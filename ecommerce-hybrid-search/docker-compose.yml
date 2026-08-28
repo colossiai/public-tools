@@ -1,0 +1,44 @@
+# ParadeDB = PostgreSQL + pgvector + pg_search(Tantivy BM25)
+#
+# 为什么不用官方 pgvector 镜像：
+#   PostgreSQL 内置的 ts_rank / ts_rank_cd 没有 IDF，不是 BM25。
+#   要在 PG 里拿到真正的 BM25（带 IDF + 文档长度归一化），需要 pg_search。
+#   ParadeDB 把 pgvector 和 pg_search 打在一个镜像里，正好用来验证
+#   「PG 单体能不能同时打赢向量检索和词汇检索」这个命题。
+#
+# 版本提示：pg_search 的 DDL（bm25 索引的 WITH 选项、分词器名字）在小版本之间
+#   变动过。生产请把 latest 换成具体 tag，并用下面的命令确认当前版本的语法：
+#     docker compose exec db psql -U postgres -c '\dx'
+#     docker compose exec db psql -U postgres -c '\df paradedb.*'
+#   src/db.py 会在运行时探测 pg_search 是否可用，不可用时自动降级到
+#   tsvector + ts_rank_cd 路径（见 README「降级路径」）。
+
+services:
+  db:
+    image: paradedb/paradedb:latest
+    container_name: ehs-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ehs
+    ports:
+      - "5433:5432"          # 用 5433 避开本机可能已有的 PG
+    volumes:
+      - ehs_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ehs"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    # HNSW 索引必须常驻内存才有意义，给足 shared_buffers
+    command:
+      - postgres
+      - -c
+      - shared_buffers=1GB
+      - -c
+      - maintenance_work_mem=1GB
+      - -c
+      - max_parallel_maintenance_workers=4
+
+volumes:
+  ehs_pgdata:
