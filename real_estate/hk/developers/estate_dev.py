@@ -1,6 +1,7 @@
 # 屋苑 -> 发展商：用维基百科公开列表（不经中原 API），对应到 raw 数据的 (estate, hma)
 # 来源：zh.wikipedia「香港私人屋苑列表」（有發展商栏）、「香港資助出售房屋列表」（居屋 -> 房委會/房協）、「租者置其屋計劃」（邨 -> 房委會），
-#       另外，列表里没有、成交 >=20 宗的屋苑，再查同名条目信息框的「發展商」
+#       另外，列表里没有、成交 >=20 宗的屋苑，再查同名条目信息框的「發展商」；
+#       仍没有的，合并 centaline_developers.csv（中原屋苑专页，由 centaline_dev.py 生成）
 # 用法：python3 -I estate_dev.py   输出 estate_developers.csv、estate_developers_unmatched.csv
 import json,re,os,glob,csv,sys,subprocess,urllib.parse
 from collections import defaultdict,Counter
@@ -18,7 +19,8 @@ def page(p):
 ALIAS={'新鴻基地產':'新鴻基','信和置業':'信置','信和集團':'信置','恒基地產':'恒基兆業','恒基兆業地產':'恒基兆業','恆基兆業':'恒基兆業','恆基地產':'恒基兆業','恆基兆業地產':'恒基兆業',
     '長江實業':'長實','長江實業地產':'長實','長江實業集團':'長實','長實集團':'長實','新世界發展':'新世界','港鐵公司':'港鐵','地鐵公司':'港鐵','南豐集團':'南豐','南豐發展':'南豐',
     '恒隆地產':'恒隆','恆隆地產':'恒隆','恒隆集團':'恒隆','會德豐地產':'會德豐','嘉華國際':'嘉華','嘉華國際集團':'嘉華','市區重建局':'市建局','市區重建局 (香港)':'市建局',
-    '香港房屋協會':'房協','麗新集團':'麗新','麗新發展':'麗新','華懋集團':'華懋','太古地產':'太古','九龍倉集團':'九龍倉','嘉里建設':'嘉里','中國海外發展':'中國海外','和記黃埔地產':'和記黃埔'}
+    '香港房屋協會':'房協','麗新集團':'麗新','麗新發展':'麗新','華懋集團':'華懋','太古地產':'太古','九龍倉集團':'九龍倉','嘉里建設':'嘉里','中國海外發展':'中國海外','和記黃埔地產':'和記黃埔',
+    '嘉里建設':'嘉里','麗新集團':'麗新','宏安集團':'宏安地產','華人置業集團':'華人置業','長江實業(集團)':'長實','中國海外集團':'中國海外','華置':'華人置業'}
 def companies(s):  # 信息框的自由文本 -> 公司名：去括号说明，按「及/與/；」拆开，「X屬下的Y」取 X
     out=[]
     s=re.sub(r'<br\s*/?>','；',clean(s)); s=re.sub(r'<[^>]+>','',unlink(s))
@@ -126,6 +128,16 @@ for m in want:
     out.append(dict(m,developers='；'.join(dict.fromkeys(devs)),wiki_name=m['estate'],matched_on=m['estate'],match=q,wiki_district='',wiki_year='',source='維基條目信息框'))
     m['done']=1
 miss=[m for m in miss if not m.get('done')]
+# 维基仍对不上的：用 centaline_dev.py 抓到的中原屋苑专页「發展商」（如有）
+if os.path.exists('centaline_developers.csv'):
+    cd={(r['estate'],r['hma']):r for r in csv.DictReader(open('centaline_developers.csv',encoding='utf-8-sig'))}
+    for m in miss:
+        r=cd.get((m['estate'],m['hma']))
+        if not r: continue
+        devs=list(dict.fromkeys(ALIAS.get(d,d) for d in (x.strip() for x in r['developer'].split('/')) if d))
+        out.append(dict(m,developers='；'.join(devs),wiki_name='',matched_on=r['typeCode'],match='typeCode',wiki_district='',wiki_year='',source='中原屋苑專頁'))
+        m['done']=1
+    miss=[m for m in miss if not m.get('done')]
 out.sort(key=lambda r:-r['n_trans']); miss.sort(key=lambda r:-r['n_trans'])
 for f,rs in [('estate_developers.csv',out),('estate_developers_unmatched.csv',miss)]:
     with open(f,'w',newline='',encoding='utf-8-sig') as fo:
