@@ -4,7 +4,7 @@ import json,glob,csv,os,sys,statistics as st
 from collections import defaultdict,Counter
 import numpy as np
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
-RAW=sys.argv[1] if len(sys.argv)>1 else '../../../__temp/hk_real_estate/raw'; D='.'
+RAW=sys.argv[1] if len(sys.argv)>1 else '../../../__temp/hk_real_estate/raw'; D=os.environ.get('OUT','.'); os.makedirs(D,exist_ok=True)
 L12='2025-11-01'; B_HI='2024-11-01'; B_LO='2023-11-01'; MINN=int(os.environ.get('MINN',20))
 rows=[]; seen=set()
 for f in sorted(glob.glob(f'{RAW}/band_*.json')):
