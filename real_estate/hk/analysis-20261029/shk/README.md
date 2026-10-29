@@ -23,7 +23,6 @@
 | `shk_top20.csv` | 前 20 名。只计 `low_sample=False` 的屋苑，也就是两期各至少 20 宗 |
 | `shk_top20_10k_20k.csv` | 同上，再加条件：近 12 个月中位尺价在 10,000–20,000 之间 |
 | `shk_top20_10k_20k_2005plus.csv` | 尺价 10,000–20,000，且 2005 年或之后入伙。合乎 20 宗门槛的只有 16 个，所以这个文件用 10 宗门槛，样本少的要看 `low_sample` |
-| `shk_rank.py` | 由 `shk_estates.csv` 和全港 MINN=10 的表生成上面四个 CSV。要先跑哪些步骤，见文件开头的注释 |
 
 ## `shk_estates.csv` 的栏位（由 `../dev_agg.py` 生成）
 
@@ -41,7 +40,7 @@
 | `opYear` | 入伙年份（中原原文，例如 `2005年`） |
 | `adj_chg_3y` | 全港表（`../estates_3y.csv`，MINN=20）中的 `adj_chg`。屋苑不在那张表里时留空 |
 
-## `shk_estates_3y.csv` 和三份 top 20 的栏位（由 `shk_rank.py` 生成）
+## `shk_estates_3y.csv` 和三份 top 20 的栏位（由 `../dev_rank.py shk shk` 生成，前置步骤见该文件开头的注释）
 
 | 栏位 | 定义 |
 |---|---|

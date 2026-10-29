@@ -1,10 +1,11 @@
-# 新鸿基（de183）屋苑 3 年表现：合并 shk_estates.csv 与全港 3 年表（MINN=10），输出 shk_estates_3y.csv 和三份 top 20
-# 前置：python3 -I ../dev_agg.py de183 shk/shk_estates.csv
-#       MINN=10 OUT=../../../__temp/hk_real_estate/min10 uv run --with numpy python -I ../all_hk_rank.py
-import csv,os,re
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
+# 发展商屋苑 3 年表现：合并 <dir>/<prefix>_estates.csv 与全港 3 年表（MINN=10），输出 <prefix>_estates_3y.csv 和三份 top 20
+# 用法：python3 -I dev_rank.py shk shk
+# 前置：python3 -I dev_fetch.py de183 && python3 -I dev_agg.py de183 shk/shk_estates.csv
+#       MINN=10 OUT=../../../__temp/hk_real_estate/min10 uv run --with numpy python -I all_hk_rank.py
+import csv,os,re,sys
+os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)),sys.argv[1])); P=sys.argv[2]
 MIN10='../../../../__temp/hk_real_estate/min10/estates_3y.csv'
-S={(r['estate'],r['hma']):r for r in csv.DictReader(open('shk_estates.csv',encoding='utf-8-sig'))}
+S={(r['estate'],r['hma']):r for r in csv.DictReader(open(f'{P}_estates.csv',encoding='utf-8-sig'))}
 hk={(r['estate'],r['hma']):i+1 for i,r in enumerate(csv.DictReader(open('../estates_3y.csv',encoding='utf-8-sig')))}  # MINN=20 全港排名
 rows=[]
 for r in csv.DictReader(open(MIN10,encoding='utf-8-sig')):
@@ -22,10 +23,10 @@ def write(f,rs):
     with open(f,'w',newline='',encoding='utf-8-sig') as fo:
         w=csv.DictWriter(fo,fieldnames=['rank']+cols,extrasaction='ignore'); w.writeheader()
         for i,r in enumerate(rs): w.writerow(dict(r,rank=i+1))
-write('shk_estates_3y.csv',rows)
+write(f'{P}_estates_3y.csv',rows)
 ok=[r for r in rows if not r['low_sample']]
 band=lambda r:10000<=int(r['med_last'])<=20000
-write('shk_top20.csv',ok[:20])
-write('shk_top20_10k_20k.csv',[r for r in ok if band(r)][:20])
-write('shk_top20_10k_20k_2005plus.csv',[r for r in rows if band(r) and (r['built'] or 0)>=2005][:20])
-print(len(rows),'SHK estates (>=10/period),',len(ok),'with >=20/period')
+write(f'{P}_top20.csv',ok[:20])
+write(f'{P}_top20_10k_20k.csv',[r for r in ok if band(r)][:20])
+write(f'{P}_top20_10k_20k_2005plus.csv',[r for r in rows if band(r) and (r['built'] or 0)>=2005][:20])
+print(len(rows),P,'estates (>=10/period),',len(ok),'with >=20/period')

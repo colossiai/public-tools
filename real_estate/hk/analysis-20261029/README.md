@@ -16,3 +16,5 @@
 - `dev_fetch.py <code>`：抓该发展商近 3 年的成交（含一手），自动按尺价分段，存到 `__temp/hk_real_estate/dev_<code>/`。
 - `dev_agg.py <code>`：按屋苑汇总，输出 `dev_<code>_estates.csv`，含地区、成交数、一手宗数、近 12 月二手中位尺价、3 年调整升幅。中原的发展商标签包括合资项目，例如沙田第一城、日出康城。
 - 新鸿基的统计在 `shk/`，见 `shk/README.md`。
+- `dev_rank.py <dir> <prefix>`：把 `<dir>/<prefix>_estates.csv` 与全港 3 年表合并，输出该发展商的 3 年表和三份 top 20。
+- 信和置业的统计在 `sino/`，见 `sino/README.md`。
