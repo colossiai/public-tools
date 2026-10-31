@@ -138,6 +138,15 @@ if os.path.exists('centaline_developers.csv'):
         out.append(dict(m,developers='；'.join(devs),wiki_name='',matched_on=r['typeCode'],match='typeCode',wiki_district='',wiki_year='',source='中原屋苑專頁'))
         m['done']=1
     miss=[m for m in miss if not m.get('done')]
+# 仍对不上的：手动补充 manual_developers.csv（查不到可靠资料的旧楼不填，留在 unmatched）
+if os.path.exists('manual_developers.csv'):
+    md={(r['estate'],r['hma']):r for r in csv.DictReader(open('manual_developers.csv',encoding='utf-8-sig'))}
+    for m in miss:
+        r=md.get((m['estate'],m['hma']))
+        if not r: continue
+        out.append(dict(m,developers=r['developers'],wiki_name='',matched_on=m['estate'],match='manual',wiki_district='',wiki_year='',source='手動補充'))
+        m['done']=1
+    miss=[m for m in miss if not m.get('done')]
 out.sort(key=lambda r:-r['n_trans']); miss.sort(key=lambda r:-r['n_trans'])
 for f,rs in [('estate_developers.csv',out),('estate_developers_unmatched.csv',miss)]:
     with open(f,'w',newline='',encoding='utf-8-sig') as fo:
