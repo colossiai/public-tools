@@ -1,0 +1,9 @@
+[
+  {"sn":"s1","uid":1001,"sym":"00700.HK","mkt":"HK","ccy":"HKD","amt":44400,"qty":-100,"code":"SELL","ts":1795500000},
+  {"sn":"s2","uid":1001,"sym":"00700.HK","mkt":"HK","ccy":"HKD","amt":-31798,"qty":100,"code":"BUY","ts":1795400000},
+  {"sn":"s3","uid":1001,"sym":"AAPL.US","mkt":"US","ccy":"USD","amt":-2310.5,"qty":10,"code":"BUY","ts":1795300000},
+  {"sn":"s4","uid":1002,"sym":"AAPL.US","mkt":"US","ccy":"USD","amt":0,"qty":-134,"code":"CA","ts":1795200000},
+  {"sn":"s5","uid":1002,"sym":"09988.HK","mkt":"HK","ccy":"HKD","amt":-8800,"qty":100,"code":"BUY","ts":1795100000},
+  {"sn":"s6","uid":1003,"sym":"TSLA.US","mkt":"US","ccy":"USD","amt":5120,"qty":-20,"code":"SELL","ts":1795000000},
+  {"sn":"s7","uid":1003,"sym":"00005.HK","mkt":"HK","ccy":"HKD","amt":null,"qty":-5,"code":"TRANSFER","ts":1794900000}
+]

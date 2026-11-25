@@ -1,0 +1,5 @@
+[
+  {"uid":1001,"name":"alice","level":"vip1"},
+  {"uid":1002,"name":"bob","level":"vip2"},
+  {"uid":1004,"name":"dave","level":"vip1"}
+]
