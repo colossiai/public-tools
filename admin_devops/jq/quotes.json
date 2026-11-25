@@ -1,0 +1,8 @@
+{
+    "code": 0,
+    "data": [
+        {"symbol": "GOOG.US", "last":300.0},
+        {"symbol": "AAPL.US", "last":280.0},
+        {"symbol": "ANT.US", "last":90.0}
+    ]
+}
